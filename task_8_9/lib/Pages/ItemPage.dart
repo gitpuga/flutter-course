@@ -229,6 +229,7 @@ class _ItemPageState extends State<ItemPage> {
                   UpdateItem(item);
                   Navigator.pop(context);
                 },
+                color: Colors.black,
               ),
             ),
             body: SingleChildScrollView(

@@ -312,17 +312,15 @@ func updateUserHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/products", getProductsHandler)           // Получить все продукты
-	http.HandleFunc("/products/create", createProductHandler)  // Создать продукт
-	http.HandleFunc("/products/", getProductByIDHandler)       // Получить продукт по ID
-	http.HandleFunc("/products/update/", updateProductHandler) // Обновить продукт
-	http.HandleFunc("/products/delete/", deleteProductHandler) // Удалить продукт
-
-	http.HandleFunc("/favorite_products", getFavoriteProductsHandler)
-	http.HandleFunc("/shop_cart_products", getShopCartProductsHandler)
-
 	http.HandleFunc("/users/", getUserByIDHandler)
 	http.HandleFunc("/users/update/", updateUserHandler)
+	http.HandleFunc("/favorite_products", getFavoriteProductsHandler)
+	http.HandleFunc("/shop_cart_products", getShopCartProductsHandler)
+	http.HandleFunc("/products", getProductsHandler)
+	http.HandleFunc("/products/create", createProductHandler)
+	http.HandleFunc("/products/", getProductByIDHandler)
+	http.HandleFunc("/products/update/", updateProductHandler)
+	http.HandleFunc("/products/delete/", deleteProductHandler)
 
 	fmt.Println("Server is running on port 8080!")
 	http.ListenAndServe(":8080", nil)

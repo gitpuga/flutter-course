@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "556876368112",
+    "project_id": "camerashop-2d4c0",
+    "storage_bucket": "camerashop-2d4c0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:556876368112:android:65e431b97e174e3e01da35",
+        "android_client_info": {
+          "package_name": "com.puga.camerashop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCycMwk-GG33L3grGD4svuA4vvxUZzYiU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

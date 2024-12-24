@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:task_8_9/api_service.dart';
-import 'package:task_8_9/model/items.dart';
+import 'package:frontend/api_service.dart';
+import 'package:frontend/model/items.dart';
 
 class AddPage extends StatefulWidget {
   const AddPage({super.key});
@@ -45,10 +45,10 @@ class _AddPageState extends State<AddPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: const Color.fromARGB(255, 255, 246, 218),
         appBar: AppBar(
           title: const Text('Товары'),
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          backgroundColor: Colors.amber[200],
         ),
         body: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -67,10 +67,12 @@ class _AddPageState extends State<AddPage> {
                             TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 1.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 1.0)),
                         focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 2.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 2.0)),
                       ),
                       controller: _addController1,
                     ),
@@ -92,11 +94,11 @@ class _AddPageState extends State<AddPage> {
                                   fontSize: 14.0, color: Colors.grey),
                               enabledBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Color.fromRGBO(0, 0, 0, 1),
+                                      color: Color.fromRGBO(255, 160, 0, 1),
                                       width: 1.0)),
                               focusedBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Color.fromRGBO(0, 0, 0, 1),
+                                      color: Color.fromRGBO(255, 160, 0, 1),
                                       width: 2.0)),
                             ),
                             controller: _addController2,
@@ -131,8 +133,7 @@ class _AddPageState extends State<AddPage> {
                                     height:
                                         MediaQuery.of(context).size.width * 0.2,
                                     decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                          255, 255, 255, 255),
+                                      color: Colors.amber[200],
                                       border: Border.all(
                                           color: Colors.grey, width: 1),
                                     ),
@@ -157,16 +158,18 @@ class _AddPageState extends State<AddPage> {
                       style:
                           const TextStyle(fontSize: 14.0, color: Colors.black),
                       decoration: const InputDecoration(
-                        fillColor: Color.fromARGB(255, 255, 255, 255),
+                        fillColor: Color.fromARGB(255, 255, 246, 218),
                         hintText: 'Цена товара',
                         hintStyle:
                             TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 1.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 1.0)),
                         focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 2.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 2.0)),
                       ),
                       controller: _addController3,
                     ),
@@ -177,16 +180,18 @@ class _AddPageState extends State<AddPage> {
                       style:
                           const TextStyle(fontSize: 14.0, color: Colors.black),
                       decoration: const InputDecoration(
-                        fillColor: Color.fromARGB(255, 255, 255, 255),
+                        fillColor: Color.fromARGB(255, 255, 246, 218),
                         hintText: 'Описание товара',
                         hintStyle:
                             TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 1.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 1.0)),
                         focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 2.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 2.0)),
                       ),
                       controller: _addController4,
                     ),
@@ -196,8 +201,7 @@ class _AddPageState extends State<AddPage> {
                   ),
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 255, 255, 255),
+                          backgroundColor: Colors.amber[200],
                           padding: const EdgeInsets.only(
                               bottom: 13.0, top: 13.0, right: 30.0, left: 30.0),
                           shape: RoundedRectangleBorder(

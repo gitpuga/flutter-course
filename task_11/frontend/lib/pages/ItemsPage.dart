@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/Pages/AddPage.dart';
 import 'package:frontend/Pages/ItemPage.dart';
 import 'package:frontend/api_service.dart';
+import 'package:frontend/auth/auth_service.dart';
 import 'package:frontend/model/items.dart';
 
 class ItemsPage extends StatefulWidget {
@@ -14,22 +15,23 @@ class ItemsPage extends StatefulWidget {
 }
 
 class _ItemsPageState extends State<ItemsPage> {
+  final userEmail = AuthService().getCurrentUserEmail();
   late Future<List<Items>> ItemsList;
   late List<Items> UpdatedItemsList;
 
   @override
   void initState() {
     super.initState();
-    ItemsList = ApiService().getProducts();
-    ApiService().getProducts().then(
+    ItemsList = ApiService().getProducts(userEmail!);
+    ApiService().getProducts(userEmail!).then(
           (value) => {UpdatedItemsList = value},
         );
   }
 
   void _refreshData() {
     setState(() {
-      ItemsList = ApiService().getProducts();
-      ApiService().getProducts().then(
+      ItemsList = ApiService().getProducts(userEmail!);
+      ApiService().getProducts(userEmail!).then(
             (value) => {UpdatedItemsList = value},
           );
     });
@@ -47,7 +49,7 @@ class _ItemsPageState extends State<ItemsPage> {
         favorite: !thisItem.favorite,
         shopcart: thisItem.shopcart,
         count: thisItem.count);
-    ApiService().addProductFavorite(newItem, 1);
+    ApiService().addProductFavorite(newItem, userEmail!);
     setState(() {
       UpdatedItemsList.elementAt(
               UpdatedItemsList.indexWhere((el) => el.id == thisItem.id))
@@ -68,7 +70,7 @@ class _ItemsPageState extends State<ItemsPage> {
           count: thisItem.count);
       ApiService().updateProductStatus(newItem);
     } else {
-      ApiService().deleteProductFavorite(1, thisItem.id);
+      ApiService().deleteProductFavorite(userEmail!, thisItem.id);
     }
     setState(() {
       UpdatedItemsList.elementAt(
@@ -110,7 +112,7 @@ class _ItemsPageState extends State<ItemsPage> {
         favorite: thisItem.favorite,
         shopcart: thisItem.shopcart,
         count: thisItem.count + 1);
-    ApiService().updateProductShopCart(newItem, 1);
+    ApiService().updateProductShopCart(newItem, userEmail!);
     setState(() {
       UpdatedItemsList.elementAt(
               UpdatedItemsList.indexWhere((el) => el.id == thisItem.id))
@@ -121,7 +123,7 @@ class _ItemsPageState extends State<ItemsPage> {
   void decrement(Items thisItem) {
     final count = thisItem.count;
     if (count == 1) {
-      ApiService().deleteProductShopCart(1, thisItem.id);
+      ApiService().deleteProductShopCart(userEmail!, thisItem.id);
     } else {
       Items newItem = Items(
           id: thisItem.id,
@@ -132,7 +134,7 @@ class _ItemsPageState extends State<ItemsPage> {
           favorite: thisItem.favorite,
           shopcart: thisItem.shopcart,
           count: thisItem.count - 1);
-      ApiService().updateProductShopCart(newItem, 1);
+      ApiService().updateProductShopCart(newItem, userEmail!);
     }
     setState(() {
       if (count == 1) {
@@ -211,8 +213,9 @@ class _ItemsPageState extends State<ItemsPage> {
                                   Center(
                                     child: Image.network(
                                       ItemsList.elementAt(index).image,
-                                      width: MediaQuery.of(context).size.width *
-                                          0.4,
+                                      width:
+                                          MediaQuery.of(context).size.width *
+                                              0.4,
                                       height:
                                           MediaQuery.of(context).size.width *
                                               0.4,
@@ -235,8 +238,7 @@ class _ItemsPageState extends State<ItemsPage> {
                                                   .size
                                                   .width *
                                               0.4,
-                                          color: const Color.fromARGB(
-                                              255, 255, 255, 255),
+                                          color: const Color.fromARGB(255, 255, 255, 255),
                                           child: const Center(
                                               child: Text(
                                             'нет картинки',
@@ -277,7 +279,8 @@ class _ItemsPageState extends State<ItemsPage> {
                                         '${ItemsList.elementAt(index).cost} ₽',
                                         style: const TextStyle(
                                             fontSize: 12,
-                                            color: Color.fromARGB(255, 0, 0, 0),
+                                            color:
+                                                Color.fromARGB(255, 0, 0, 0),
                                             fontWeight: FontWeight.bold),
                                       ),
                                       Expanded(
@@ -315,8 +318,8 @@ class _ItemsPageState extends State<ItemsPage> {
                                                       MainAxisAlignment.center,
                                                   children: [
                                                     IconButton(
-                                                        icon: const Icon(
-                                                            Icons.remove),
+                                                        icon:
+                                                            const Icon(Icons.remove),
                                                         onPressed: () => {
                                                               decrement(
                                                                   UpdatedItemsList
@@ -331,9 +334,7 @@ class _ItemsPageState extends State<ItemsPage> {
                                                             BorderRadius
                                                                 .circular(5.0),
                                                         border: Border.all(
-                                                            color: const Color
-                                                                .fromARGB(
-                                                                255, 0, 0, 0),
+                                                            color: const Color.fromARGB(255, 255, 255, 255),
                                                             width: 2),
                                                       ),
                                                       child: Padding(
@@ -358,8 +359,7 @@ class _ItemsPageState extends State<ItemsPage> {
                                                       ),
                                                     ),
                                                     IconButton(
-                                                        icon: const Icon(
-                                                            Icons.add),
+                                                        icon: const Icon(Icons.add),
                                                         onPressed: () => {
                                                               increment(
                                                                   UpdatedItemsList
@@ -388,11 +388,9 @@ class _ItemsPageState extends State<ItemsPage> {
                                                             30),
                                                     side: const BorderSide(
                                                         width: 2,
-                                                        color: Color.fromRGBO(
-                                                            0, 0, 0, 1))),
+                                                        color: Color.fromRGBO(0, 0, 0, 1))),
                                                 backgroundColor:
-                                                    const Color.fromARGB(
-                                                        255, 255, 255, 255),
+                                                    const Color.fromARGB(255, 255, 255, 255),
                                               ),
                                               child: const Text("В корзину",
                                                   style:

@@ -36,42 +36,42 @@ class _ItemsPageState extends State<ItemsPage> {
   }
 
   void AddFavorite(
-    Items this_item,
+    Items thisItem,
   ) {
-    Items new_item = Items(
-        id: this_item.id,
-        name: this_item.name,
-        image: this_item.image,
-        cost: this_item.cost,
-        describtion: this_item.describtion,
-        favorite: !this_item.favorite,
-        shopcart: this_item.shopcart,
-        count: this_item.count);
-    ApiService().updateProductStatus(new_item);
+    Items newItem = Items(
+        id: thisItem.id,
+        name: thisItem.name,
+        image: thisItem.image,
+        cost: thisItem.cost,
+        describtion: thisItem.describtion,
+        favorite: !thisItem.favorite,
+        shopcart: thisItem.shopcart,
+        count: thisItem.count);
+    ApiService().updateProductStatus(newItem);
     setState(() {
       UpdatedItemsList.elementAt(
-              UpdatedItemsList.indexWhere((el) => el.id == this_item.id))
-          .favorite = !this_item.favorite;
+              UpdatedItemsList.indexWhere((el) => el.id == thisItem.id))
+          .favorite = !thisItem.favorite;
     });
   }
 
-  void AddShopCart(Items this_item) async {
-    Items new_item = Items(
-        id: this_item.id,
-        name: this_item.name,
-        image: this_item.image,
-        cost: this_item.cost,
-        describtion: this_item.describtion,
-        favorite: this_item.favorite,
+  void AddShopCart(Items thisItem) async {
+    Items newItem = Items(
+        id: thisItem.id,
+        name: thisItem.name,
+        image: thisItem.image,
+        cost: thisItem.cost,
+        describtion: thisItem.describtion,
+        favorite: thisItem.favorite,
         shopcart: true,
         count: 1);
-    ApiService().updateProductStatus(new_item);
+    ApiService().updateProductStatus(newItem);
     setState(() {
       UpdatedItemsList.elementAt(
-              UpdatedItemsList.indexWhere((el) => el.id == this_item.id))
+              UpdatedItemsList.indexWhere((el) => el.id == thisItem.id))
           .shopcart = true;
       UpdatedItemsList.elementAt(
-          UpdatedItemsList.indexWhere((el) => el.id == this_item.id)).count = 1;
+          UpdatedItemsList.indexWhere((el) => el.id == thisItem.id)).count = 1;
     });
   }
 
@@ -96,57 +96,57 @@ class _ItemsPageState extends State<ItemsPage> {
     _refreshData();
   }
 
-  void increment(Items this_item) {
-    Items new_item = Items(
-        id: this_item.id,
-        name: this_item.name,
-        image: this_item.image,
-        cost: this_item.cost,
-        describtion: this_item.describtion,
-        favorite: this_item.favorite,
-        shopcart: this_item.shopcart,
-        count: this_item.count + 1);
-    ApiService().updateProductStatus(new_item);
+  void increment(Items thisItem) {
+    Items newItem = Items(
+        id: thisItem.id,
+        name: thisItem.name,
+        image: thisItem.image,
+        cost: thisItem.cost,
+        describtion: thisItem.describtion,
+        favorite: thisItem.favorite,
+        shopcart: thisItem.shopcart,
+        count: thisItem.count + 1);
+    ApiService().updateProductStatus(newItem);
     setState(() {
       UpdatedItemsList.elementAt(
-              UpdatedItemsList.indexWhere((el) => el.id == this_item.id))
+              UpdatedItemsList.indexWhere((el) => el.id == thisItem.id))
           .count += 1;
     });
   }
 
-  void decrement(Items this_item) {
-    final count = this_item.count;
-    Items new_item;
+  void decrement(Items thisItem) {
+    final count = thisItem.count;
+    Items newItem;
     if (count == 1) {
-      new_item = Items(
-          id: this_item.id,
-          name: this_item.name,
-          image: this_item.image,
-          cost: this_item.cost,
-          describtion: this_item.describtion,
-          favorite: this_item.favorite,
+      newItem = Items(
+          id: thisItem.id,
+          name: thisItem.name,
+          image: thisItem.image,
+          cost: thisItem.cost,
+          describtion: thisItem.describtion,
+          favorite: thisItem.favorite,
           shopcart: false,
           count: 0);
     } else {
-      new_item = Items(
-          id: this_item.id,
-          name: this_item.name,
-          image: this_item.image,
-          cost: this_item.cost,
-          describtion: this_item.describtion,
-          favorite: this_item.favorite,
-          shopcart: this_item.shopcart,
-          count: this_item.count - 1);
+      newItem = Items(
+          id: thisItem.id,
+          name: thisItem.name,
+          image: thisItem.image,
+          cost: thisItem.cost,
+          describtion: thisItem.describtion,
+          favorite: thisItem.favorite,
+          shopcart: thisItem.shopcart,
+          count: thisItem.count - 1);
     }
-    ApiService().updateProductStatus(new_item);
+    ApiService().updateProductStatus(newItem);
     setState(() {
       if (count == 1) {
         UpdatedItemsList.elementAt(
-                UpdatedItemsList.indexWhere((el) => el.id == this_item.id))
+                UpdatedItemsList.indexWhere((el) => el.id == thisItem.id))
             .shopcart = false;
       } else {
         UpdatedItemsList.elementAt(
-                UpdatedItemsList.indexWhere((el) => el.id == this_item.id))
+                UpdatedItemsList.indexWhere((el) => el.id == thisItem.id))
             .count -= 1;
       }
     });

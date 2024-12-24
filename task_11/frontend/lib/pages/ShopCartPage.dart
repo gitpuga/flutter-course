@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:frontend/Pages/ItemPage.dart';
 import 'package:frontend/api_service.dart';
+import 'package:frontend/auth/auth_service.dart';
 import 'package:frontend/model/items.dart';
 
 class ShopCartPage extends StatefulWidget {
@@ -14,22 +15,23 @@ class ShopCartPage extends StatefulWidget {
 }
 
 class _ShopCartPageState extends State<ShopCartPage> {
+  final userEmail = AuthService().getCurrentUserEmail();
   late Future<List<Items>> ItemsFromCart;
   late List<Items> UpdatedItemsFromCart;
 
   @override
   void initState() {
     super.initState();
-    ItemsFromCart = ApiService().getShopCartProducts(1);
-    ApiService().getShopCartProducts(1).then(
+    ItemsFromCart = ApiService().getShopCartProducts(userEmail!);
+    ApiService().getShopCartProducts(userEmail!).then(
           (value) => {UpdatedItemsFromCart = value},
         );
   }
 
   void _refreshData() {
     setState(() {
-      ItemsFromCart = ApiService().getShopCartProducts(1);
-      ApiService().getShopCartProducts(1).then(
+      ItemsFromCart = ApiService().getShopCartProducts(userEmail!);
+      ApiService().getShopCartProducts(userEmail!).then(
             (value) => {UpdatedItemsFromCart = value},
           );
     });
@@ -142,7 +144,7 @@ class _ShopCartPageState extends State<ShopCartPage> {
         favorite: thisItem.favorite,
         shopcart: thisItem.shopcart,
         count: thisItem.count + 1);
-    ApiService().updateProductShopCart(newItem, 1);
+    ApiService().updateProductShopCart(newItem, userEmail!);
     setState(() {
       UpdatedItemsFromCart.elementAt(
               UpdatedItemsFromCart.indexWhere((el) => el.id == thisItem.id))
@@ -152,6 +154,7 @@ class _ShopCartPageState extends State<ShopCartPage> {
 
   void decrement(Items thisItem) {
     final count = thisItem.count;
+    Items newItem;
     if (count > 1) {
       Items newItem = Items(
           id: thisItem.id,
@@ -162,7 +165,7 @@ class _ShopCartPageState extends State<ShopCartPage> {
           favorite: thisItem.favorite,
           shopcart: thisItem.shopcart,
           count: thisItem.count - 1);
-      ApiService().updateProductShopCart(newItem, 1);
+      ApiService().updateProductShopCart(newItem, userEmail!);
     }
     setState(() {
       if (count > 1) {
@@ -176,7 +179,7 @@ class _ShopCartPageState extends State<ShopCartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: Colors.amber[200],
         appBar: AppBar(
           title: const Text('Корзина'),
           backgroundColor: Colors.white70,
@@ -258,7 +261,7 @@ class _ShopCartPageState extends State<ShopCartPage> {
                                                         ? 1
                                                         : 0);
                                             ApiService().deleteProductShopCart(
-                                                1, newItem.id);
+                                                userEmail!, newItem.id);
                                             setState(() {
                                               UpdatedItemsFromCart.removeAt(
                                                   UpdatedItemsFromCart
@@ -272,8 +275,8 @@ class _ShopCartPageState extends State<ShopCartPage> {
                                             _refreshData();
                                           }
                                         },
-                                        backgroundColor: const Color.fromARGB(
-                                            255, 255, 255, 255),
+                                        backgroundColor: const Color.fromRGBO(
+                                            255, 160, 0, 1),
                                         foregroundColor: Colors.white,
                                         icon: Icons.delete,
                                       ),
@@ -298,7 +301,7 @@ class _ShopCartPageState extends State<ShopCartPage> {
                                                 0.2,
                                         decoration: BoxDecoration(
                                           color: const Color.fromARGB(
-                                              255, 255, 255, 255),
+                                              255, 255, 246, 218),
                                           borderRadius:
                                               BorderRadius.circular(7.0),
                                         ),
@@ -307,48 +310,55 @@ class _ShopCartPageState extends State<ShopCartPage> {
                                             Padding(
                                               padding:
                                                   const EdgeInsets.all(10.0),
-                                              child: Image.network(
-                                                ItemsFromCart.elementAt(index)
-                                                    .image,
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.3,
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.3,
-                                                fit: BoxFit.cover,
-                                                loadingBuilder: (context, child,
-                                                    loadingProgress) {
-                                                  if (loadingProgress == null) {
-                                                    return child;
-                                                  }
-                                                  return const CircularProgressIndicator();
-                                                },
-                                                errorBuilder: (context, error,
-                                                    stackTrace) {
-                                                  return Container(
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.3,
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.3,
-                                                    color: Colors.amber[200],
-                                                    child: const Center(
-                                                        child: Text(
-                                                      'нет картинки',
-                                                      softWrap: true,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                    )),
-                                                  );
-                                                },
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: Colors.grey,
+                                                      width: 1),
+                                                ),
+                                                child: Image.network(
+                                                  ItemsFromCart.elementAt(index)
+                                                      .image,
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.3,
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.3,
+                                                  fit: BoxFit.cover,
+                                                  loadingBuilder: (context,
+                                                      child, loadingProgress) {
+                                                    if (loadingProgress == null) {
+                                                      return child;
+                                                    }
+                                                    return const CircularProgressIndicator();
+                                                  },
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return Container(
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.3,
+                                                      height:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.3,
+                                                      color: Colors.amber[200],
+                                                      child: const Center(
+                                                          child: Text(
+                                                        'нет картинки',
+                                                        softWrap: true,
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      )),
+                                                    );
+                                                  },
+                                                ),
                                               ),
                                             ),
                                             Padding(
@@ -367,9 +377,7 @@ class _ShopCartPageState extends State<ShopCartPage> {
                                                                 .width *
                                                             0.55,
                                                     child: Text(
-                                                      ItemsFromCart.elementAt(
-                                                              index)
-                                                          .name,
+                                                      ItemsFromCart.elementAt(index).name,
                                                       style: const TextStyle(
                                                           fontSize: 14),
                                                       softWrap: true,
@@ -399,9 +407,9 @@ class _ShopCartPageState extends State<ShopCartPage> {
                                                                 color: Color
                                                                     .fromARGB(
                                                                         255,
-                                                                        0,
-                                                                        0,
-                                                                        0),
+                                                                        6,
+                                                                        196,
+                                                                        9),
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold),
@@ -441,8 +449,13 @@ class _ShopCartPageState extends State<ShopCartPage> {
                                                                     .circular(
                                                                         5.0),
                                                             border: Border.all(
-                                                                color: const Color.fromARGB(255, 0, 0, 0),
-                                                                width: 1),
+                                                                color: const Color
+                                                                    .fromRGBO(
+                                                                    255,
+                                                                    160,
+                                                                    0,
+                                                                    1),
+                                                                width: 2),
                                                           ),
                                                           child: Padding(
                                                             padding:
@@ -491,10 +504,10 @@ class _ShopCartPageState extends State<ShopCartPage> {
                   Container(
                     height: MediaQuery.of(context).size.height * 0.07,
                     decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 218, 255, 224),
+                      color: Color.fromARGB(255, 255, 246, 218),
                       border: Border(
                         top: BorderSide(
-                          color: Color.fromRGBO(130, 255, 136, 1),
+                          color: Color.fromRGBO(255, 224, 130, 1),
                           width: 2,
                         ),
                       ),
@@ -508,7 +521,7 @@ class _ShopCartPageState extends State<ShopCartPage> {
                             '${UpdatedItemsFromCart.fold(0.0, (sum, item) => sum + item.count * item.cost)} ₽',
                             style: const TextStyle(
                                 fontSize: 12,
-                                color: Color.fromARGB(255, 0, 0, 0),
+                                color: Color.fromARGB(255, 6, 196, 9),
                                 fontWeight: FontWeight.bold),
                           ),
                           Expanded(
@@ -524,8 +537,10 @@ class _ShopCartPageState extends State<ShopCartPage> {
                                         borderRadius: BorderRadius.circular(30),
                                         side: const BorderSide(
                                             width: 2,
-                                            color: Color.fromRGBO(51, 255, 0, 1))),
-                                    backgroundColor: const Color.fromARGB(255, 218, 255, 229),
+                                            color: Color.fromRGBO(
+                                                255, 160, 0, 1))),
+                                    backgroundColor: const Color.fromARGB(
+                                        255, 255, 246, 218),
                                   ),
                                   child: const Text("Купить",
                                       style: TextStyle(fontSize: 12)),

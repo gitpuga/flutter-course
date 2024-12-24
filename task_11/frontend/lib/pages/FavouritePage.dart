@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/Pages/ItemPage.dart';
 import 'package:frontend/api_service.dart';
+import 'package:frontend/auth/auth_service.dart';
 import 'package:frontend/model/items.dart';
 
 class FavoritePage extends StatefulWidget {
@@ -13,29 +14,30 @@ class FavoritePage extends StatefulWidget {
 }
 
 class _FavoritePageState extends State<FavoritePage> {
+  final userEmail = AuthService().getCurrentUserEmail();
   late Future<List<Items>> ItemsFavList;
   late List<Items> UpdatedItemsFavList;
 
   @override
   void initState() {
     super.initState();
-    ItemsFavList = ApiService().getFavoriteProducts(1);
-    ApiService().getFavoriteProducts(1).then(
+    ItemsFavList = ApiService().getFavoriteProducts(userEmail!);
+    ApiService().getFavoriteProducts(userEmail!).then(
           (value) => {UpdatedItemsFavList = value},
         );
   }
 
   void _refreshData() {
     setState(() {
-      ItemsFavList = ApiService().getFavoriteProducts(1);
-      ApiService().getFavoriteProducts(1).then(
+      ItemsFavList = ApiService().getFavoriteProducts(userEmail!);
+      ApiService().getFavoriteProducts(userEmail!).then(
             (value) => {UpdatedItemsFavList = value},
           );
     });
   }
 
   void AddFavorite(Items thisItem) {
-    ApiService().deleteProductFavorite(1, thisItem.id);
+    ApiService().deleteProductFavorite(userEmail!, thisItem.id);
 
     setState(() {
       _refreshData();
@@ -65,7 +67,7 @@ class _FavoritePageState extends State<FavoritePage> {
         favorite: thisItem.favorite,
         shopcart: !thisItem.shopcart,
         count: 1);
-    ApiService().addProductShopCart(newItem, 1);
+    ApiService().addProductShopCart(newItem, userEmail!);
     setState(() {
       UpdatedItemsFavList.elementAt(
               UpdatedItemsFavList.indexWhere((el) => el.id == thisItem.id))
@@ -97,7 +99,7 @@ class _FavoritePageState extends State<FavoritePage> {
   void decrement(Items thisItem) {
     final count = thisItem.count;
     if (count == 1) {
-      ApiService().deleteProductShopCart(1, thisItem.id);
+      ApiService().deleteProductShopCart(userEmail!, thisItem.id);
     } else {
       Items newItem = Items(
           id: thisItem.id,
@@ -108,7 +110,7 @@ class _FavoritePageState extends State<FavoritePage> {
           favorite: thisItem.favorite,
           shopcart: thisItem.shopcart,
           count: thisItem.count - 1);
-      ApiService().updateProductShopCart(newItem, 1);
+      ApiService().updateProductShopCart(newItem, userEmail!);
     }
     setState(() {
       if (count == 1) {
@@ -126,7 +128,7 @@ class _FavoritePageState extends State<FavoritePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: Colors.amber[200],
         appBar: AppBar(
           title: const Text('Избранное'),
           backgroundColor: Colors.white70,
@@ -159,46 +161,52 @@ class _FavoritePageState extends State<FavoritePage> {
                             right: 5.0, left: 5.0, top: 2.0, bottom: 5.0),
                         child: Container(
                           height: MediaQuery.of(context).size.height * 0.25,
+                          //height: MediaQuery.of(context).size.height * 0.47,
                           decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border:
-                                  Border.all(color: Colors.black, width: 1)),
+                            color: const Color.fromARGB(255, 255, 246, 218),
+                            borderRadius: BorderRadius.circular(7.0),
+                          ),
                           child: Column(
                             children: [
                               const SizedBox(
                                 height: 10,
                               ),
                               Center(
-                                child: Image.network(
-                                  ItemsFavList.elementAt(index).image,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.4,
-                                  height:
-                                      MediaQuery.of(context).size.width * 0.4,
-                                  fit: BoxFit.cover,
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return const CircularProgressIndicator();
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.4,
-                                      height:
-                                          MediaQuery.of(context).size.width *
-                                              0.4,
-                                      color: const Color.fromARGB(
-                                          255, 255, 255, 255),
-                                      child: const Center(
-                                          child: Text(
-                                        'нет картинки',
-                                        softWrap: true,
-                                        textAlign: TextAlign.center,
-                                      )),
-                                    );
-                                  },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: Colors.grey, width: 1),
+                                  ),
+                                  child: Image.network(
+                                    ItemsFavList.elementAt(index).image,
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.4,
+                                    height:
+                                        MediaQuery.of(context).size.width * 0.4,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const CircularProgressIndicator();
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.4,
+                                        height:
+                                            MediaQuery.of(context).size.width *
+                                                0.4,
+                                        color: Colors.amber[200],
+                                        child: const Center(
+                                            child: Text(
+                                          'нет картинки',
+                                          softWrap: true,
+                                          textAlign: TextAlign.center,
+                                        )),
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                               Padding(
@@ -231,7 +239,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                     '${ItemsFavList.elementAt(index).cost} ₽',
                                     style: const TextStyle(
                                         fontSize: 12,
-                                        color: Color.fromARGB(255, 0, 0, 0),
+                                        color: Color.fromARGB(255, 6, 196, 9),
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Expanded(
@@ -277,9 +285,9 @@ class _FavoritePageState extends State<FavoritePage> {
                                                             5.0),
                                                     border: Border.all(
                                                         color: const Color
-                                                            .fromARGB(
-                                                            255, 0, 0, 0),
-                                                        width: 1),
+                                                            .fromRGBO(
+                                                            255, 160, 0, 1),
+                                                        width: 2),
                                                   ),
                                                   child: Padding(
                                                     padding:
@@ -327,10 +335,10 @@ class _FavoritePageState extends State<FavoritePage> {
                                                 side: const BorderSide(
                                                     width: 2,
                                                     color: Color.fromRGBO(
-                                                        0, 255, 13, 1))),
+                                                        255, 160, 0, 1))),
                                             backgroundColor:
                                                 const Color.fromARGB(
-                                                    255, 218, 255, 220),
+                                                    255, 255, 246, 218),
                                           ),
                                           child: const Text("В корзину",
                                               style: TextStyle(fontSize: 12)),

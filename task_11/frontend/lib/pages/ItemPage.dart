@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:task_8_9/api_service.dart';
-import 'package:task_8_9/model/items.dart';
+import 'package:frontend/Pages/EditProductPage.dart';
+import 'package:frontend/api_service.dart';
+import 'package:frontend/auth/auth_service.dart';
+import 'package:frontend/model/items.dart';
 
 class ItemPage extends StatefulWidget {
   const ItemPage({super.key, required this.index, required this.navToShopCart});
@@ -12,6 +14,7 @@ class ItemPage extends StatefulWidget {
 }
 
 class _ItemPageState extends State<ItemPage> {
+  final userEmail = AuthService().getCurrentUserEmail();
   late Future<Items> item;
   late Future<Items> updated_item;
   int count = 0;
@@ -21,14 +24,27 @@ class _ItemPageState extends State<ItemPage> {
   @override
   void initState() {
     super.initState();
-    item = ApiService().getProductsByID(widget.index);
-    ApiService().getProductsByID(widget.index).then(
+    item = ApiService().getProductsByID(widget.index, userEmail!);
+    ApiService().getProductsByID(widget.index, userEmail!).then(
           (value) => {
             count = value.count,
             favorite = value.favorite,
             shopcart = value.shopcart
           },
         );
+  }
+
+  void _refreshData() {
+    setState(() {
+      item = ApiService().getProductsByID(widget.index, userEmail!);
+      ApiService().getProductsByID(widget.index, userEmail!).then(
+            (value) => {
+              count = value.count,
+              favorite = value.favorite,
+              shopcart = value.shopcart
+            },
+          );
+    });
   }
 
   void UpdateItem(Items thisItem) {
@@ -45,16 +61,20 @@ class _ItemPageState extends State<ItemPage> {
   }
 
   void AddFavorite(Items thisItem) {
-    Items newItem = Items(
-        id: thisItem.id,
-        name: thisItem.name,
-        image: thisItem.image,
-        cost: thisItem.cost,
-        describtion: thisItem.describtion,
-        favorite: !thisItem.favorite,
-        shopcart: thisItem.shopcart,
-        count: thisItem.count);
-    ApiService().updateProductStatus(newItem);
+    if (!thisItem.favorite) {
+      Items newItem = Items(
+          id: thisItem.id,
+          name: thisItem.name,
+          image: thisItem.image,
+          cost: thisItem.cost,
+          describtion: thisItem.describtion,
+          favorite: !thisItem.favorite,
+          shopcart: thisItem.shopcart,
+          count: thisItem.count);
+      ApiService().updateProductStatus(newItem);
+    } else {
+      ApiService().deleteProductFavorite(userEmail!, thisItem.id);
+    }
     setState(() {
       favorite = !favorite;
     });
@@ -70,7 +90,7 @@ class _ItemPageState extends State<ItemPage> {
         favorite: thisItem.favorite,
         shopcart: !thisItem.shopcart,
         count: !thisItem.shopcart ? 1 : 0);
-    ApiService().updateProductStatus(newItem);
+    ApiService().addProductShopCart(newItem, userEmail!);
     setState(() {
       shopcart = !shopcart;
       count = 1;
@@ -81,7 +101,7 @@ class _ItemPageState extends State<ItemPage> {
     showDialog<bool>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: const Color.fromARGB(255, 255, 246, 218),
         title: SizedBox(
           width: MediaQuery.of(context).size.width * 0.9,
           child: const Padding(
@@ -106,8 +126,7 @@ class _ItemPageState extends State<ItemPage> {
         ),
         actions: [
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 255, 255, 255)),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.amber[700]),
             child: const Text('Ок',
                 style: TextStyle(color: Colors.black, fontSize: 14.0)),
             onPressed: () {
@@ -130,12 +149,12 @@ class _ItemPageState extends State<ItemPage> {
           Navigator.pop(context);
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
+          SnackBar(
+            content: const Text(
               'Товар успешно удален',
               style: TextStyle(color: Colors.black, fontSize: 16.0),
             ),
-            backgroundColor: Color.fromARGB(255, 255, 255, 255),
+            backgroundColor: Colors.amber[700],
           ),
         );
       }
@@ -152,26 +171,17 @@ class _ItemPageState extends State<ItemPage> {
         favorite: thisItem.favorite,
         shopcart: thisItem.shopcart,
         count: thisItem.count + 1);
-    ApiService().updateProductStatus(newItem);
+    ApiService().updateProductShopCart(newItem, userEmail!);
     setState(() {
       count += 1;
     });
   }
 
   void decrement(Items thisItem) {
-    Items newItem;
     if (count == 1) {
-      newItem = Items(
-          id: thisItem.id,
-          name: thisItem.name,
-          image: thisItem.image,
-          cost: thisItem.cost,
-          describtion: thisItem.describtion,
-          favorite: thisItem.favorite,
-          shopcart: false,
-          count: 0);
+      ApiService().deleteProductShopCart(userEmail!, thisItem.id);
     } else {
-      newItem = Items(
+      Items newItem = Items(
           id: thisItem.id,
           name: thisItem.name,
           image: thisItem.image,
@@ -180,8 +190,9 @@ class _ItemPageState extends State<ItemPage> {
           favorite: thisItem.favorite,
           shopcart: thisItem.shopcart,
           count: thisItem.count - 1);
+      ApiService().updateProductShopCart(newItem, userEmail!);
     }
-    ApiService().updateProductStatus(newItem);
+
     setState(() {
       if (count == 1) {
         shopcart = false;
@@ -189,6 +200,19 @@ class _ItemPageState extends State<ItemPage> {
         count -= 1;
       }
     });
+  }
+
+  void NavToEdit(index) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProductPage(
+          context,
+          index: index,
+        ),
+      ),
+    );
+    _refreshData();
   }
 
   @override
@@ -200,37 +224,48 @@ class _ItemPageState extends State<ItemPage> {
             return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
             return Scaffold(
-                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                backgroundColor: Colors.amber[200],
                 appBar: AppBar(
-                  backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                  backgroundColor: const Color.fromARGB(255, 255, 246, 218),
                 ),
                 body: Center(child: Text('Error: ${snapshot.error}')));
           } else if (!snapshot.hasData) {
             return Scaffold(
-                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                backgroundColor: Colors.amber[200],
                 appBar: AppBar(
-                  backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                  backgroundColor: const Color.fromARGB(255, 255, 246, 218),
                 ),
                 body: const Center(child: Text('No product found')));
           }
 
           final item = snapshot.data!;
           return Scaffold(
-            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+            backgroundColor: Colors.amber[200],
             appBar: AppBar(
               title: Text(
                 item.name,
                 style: const TextStyle(fontSize: 16.0),
               ),
-              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+              backgroundColor: const Color.fromARGB(255, 255, 246, 218),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
                   UpdateItem(item);
                   Navigator.pop(context);
                 },
-                color: Colors.black,
               ),
+              actions: [
+                IconButton(
+                  icon: const Padding(
+                    padding: EdgeInsets.only(right: 10.0),
+                    child: Icon(
+                      Icons.edit,
+                      size: 30,
+                    ),
+                  ),
+                  onPressed: () => {NavToEdit(item.id)},
+                ),
+              ],
             ),
             body: SingleChildScrollView(
               child: Container(
@@ -241,7 +276,7 @@ class _ItemPageState extends State<ItemPage> {
                           left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
                       child: Container(
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 255, 255, 255),
+                            color: const Color.fromARGB(255, 255, 246, 218),
                             borderRadius: BorderRadius.circular(15.0),
                           ),
                           child: Column(
@@ -283,8 +318,7 @@ class _ItemPageState extends State<ItemPage> {
                                                   .size
                                                   .width *
                                               0.65,
-                                          color: const Color.fromARGB(
-                                              255, 255, 255, 255),
+                                          color: Colors.amber[200],
                                           child: const Center(
                                               child: Text(
                                             'нет картинки',
@@ -311,8 +345,8 @@ class _ItemPageState extends State<ItemPage> {
                                           '${item.cost} ₽',
                                           style: const TextStyle(
                                               fontSize: 16,
-                                              color:
-                                                  Color.fromARGB(255, 0, 0, 0),
+                                              color: Color.fromARGB(
+                                                  255, 6, 196, 9),
                                               fontWeight: FontWeight.bold),
                                         ),
                                         Expanded(
@@ -354,7 +388,7 @@ class _ItemPageState extends State<ItemPage> {
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   color: Color.fromARGB(
-                                                      255, 0, 0, 0),
+                                                      255, 6, 196, 9),
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             Expanded(
@@ -404,11 +438,11 @@ class _ItemPageState extends State<ItemPage> {
                                                               side: const BorderSide(
                                                                   width: 2,
                                                                   color: Color
-                                                                      .fromARGB(
+                                                                      .fromRGBO(
                                                                           255,
-                                                                          255,
-                                                                          255,
-                                                                          255))),
+                                                                          160,
+                                                                          0,
+                                                                          1))),
                                                           backgroundColor:
                                                               const Color
                                                                   .fromARGB(
@@ -446,8 +480,8 @@ class _ItemPageState extends State<ItemPage> {
                                                                 .circular(5.0),
                                                         border: Border.all(
                                                             color: const Color
-                                                                .fromARGB(
-                                                                255, 0, 0, 0),
+                                                                .fromRGBO(
+                                                                255, 160, 0, 1),
                                                             width: 2),
                                                       ),
                                                       child: Padding(
@@ -490,7 +524,7 @@ class _ItemPageState extends State<ItemPage> {
                           left: 15.0, right: 15.0, top: 0.0, bottom: 10.0),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 255, 255, 255),
+                          color: const Color.fromARGB(255, 255, 246, 218),
                           borderRadius: BorderRadius.circular(15.0),
                         ),
                         child: Column(

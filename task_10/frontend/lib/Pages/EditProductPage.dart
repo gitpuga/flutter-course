@@ -70,7 +70,7 @@ class _EditProductPageState extends State<EditProductPage> {
           backgroundColor: Colors.amber[200],
         ),
         body: SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
+            physics: const BouncingScrollPhysics(),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -83,7 +83,7 @@ class _EditProductPageState extends State<EditProductPage> {
                       decoration: const InputDecoration(
                         hintText: 'Название товара',
                         hintStyle:
-                            const TextStyle(fontSize: 14.0, color: Colors.grey),
+                            TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
                                 color: Color.fromRGBO(255, 160, 0, 1),
@@ -107,9 +107,9 @@ class _EditProductPageState extends State<EditProductPage> {
                                 fontSize: 14.0, color: Colors.black),
                             decoration: const InputDecoration(
                               fillColor:
-                                  const Color.fromARGB(255, 255, 246, 218),
+                                  Color.fromARGB(255, 255, 246, 218),
                               hintText: 'Ссылка на картинку',
-                              hintStyle: const TextStyle(
+                              hintStyle: TextStyle(
                                   fontSize: 14.0, color: Colors.grey),
                               enabledBorder: UnderlineInputBorder(
                                   borderSide: BorderSide(
@@ -177,10 +177,10 @@ class _EditProductPageState extends State<EditProductPage> {
                       style:
                           const TextStyle(fontSize: 14.0, color: Colors.black),
                       decoration: const InputDecoration(
-                        fillColor: const Color.fromARGB(255, 255, 246, 218),
+                        fillColor: Color.fromARGB(255, 255, 246, 218),
                         hintText: 'Цена товара',
                         hintStyle:
-                            const TextStyle(fontSize: 14.0, color: Colors.grey),
+                            TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
                                 color: Color.fromRGBO(255, 160, 0, 1),
@@ -199,10 +199,10 @@ class _EditProductPageState extends State<EditProductPage> {
                       style:
                           const TextStyle(fontSize: 14.0, color: Colors.black),
                       decoration: const InputDecoration(
-                        fillColor: const Color.fromARGB(255, 255, 246, 218),
+                        fillColor: Color.fromARGB(255, 255, 246, 218),
                         hintText: 'Описание товара',
                         hintStyle:
-                            const TextStyle(fontSize: 14.0, color: Colors.grey),
+                            TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
                                 color: Color.fromRGBO(255, 160, 0, 1),

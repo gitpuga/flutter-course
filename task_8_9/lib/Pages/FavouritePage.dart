@@ -34,17 +34,17 @@ class _FavoritePageState extends State<FavoritePage> {
     });
   }
 
-  void AddFavorite(Items this_item) {
-    Items new_item = Items(
-        id: this_item.id,
-        name: this_item.name,
-        image: this_item.image,
-        cost: this_item.cost,
-        describtion: this_item.describtion,
-        favorite: !this_item.favorite,
-        shopcart: this_item.shopcart,
-        count: this_item.count);
-    ApiService().updateProductStatus(new_item);
+  void AddFavorite(Items thisItem) {
+    Items newItem = Items(
+        id: thisItem.id,
+        name: thisItem.name,
+        image: thisItem.image,
+        cost: thisItem.cost,
+        describtion: thisItem.describtion,
+        favorite: !thisItem.favorite,
+        shopcart: thisItem.shopcart,
+        count: thisItem.count);
+    ApiService().updateProductStatus(newItem);
     setState(() {
       _refreshData();
     });
@@ -63,78 +63,78 @@ class _FavoritePageState extends State<FavoritePage> {
     _refreshData();
   }
 
-  void AddShopCart(Items this_item) async {
-    Items new_item = Items(
-        id: this_item.id,
-        name: this_item.name,
-        image: this_item.image,
-        cost: this_item.cost,
-        describtion: this_item.describtion,
-        favorite: this_item.favorite,
-        shopcart: !this_item.shopcart,
+  void AddShopCart(Items thisItem) async {
+    Items newItem = Items(
+        id: thisItem.id,
+        name: thisItem.name,
+        image: thisItem.image,
+        cost: thisItem.cost,
+        describtion: thisItem.describtion,
+        favorite: thisItem.favorite,
+        shopcart: !thisItem.shopcart,
         count: 1);
-    ApiService().updateProductStatus(new_item);
+    ApiService().updateProductStatus(newItem);
     setState(() {
       UpdatedItemsFavList.elementAt(
-              UpdatedItemsFavList.indexWhere((el) => el.id == this_item.id))
-          .shopcart = !this_item.shopcart;
+              UpdatedItemsFavList.indexWhere((el) => el.id == thisItem.id))
+          .shopcart = !thisItem.shopcart;
       UpdatedItemsFavList.elementAt(
-              UpdatedItemsFavList.indexWhere((el) => el.id == this_item.id))
+              UpdatedItemsFavList.indexWhere((el) => el.id == thisItem.id))
           .count = 1;
     });
   }
 
-  void increment(Items this_item) {
-    Items new_item = Items(
-        id: this_item.id,
-        name: this_item.name,
-        image: this_item.image,
-        cost: this_item.cost,
-        describtion: this_item.describtion,
-        favorite: this_item.favorite,
-        shopcart: this_item.shopcart,
-        count: this_item.count + 1);
-    ApiService().updateProductStatus(new_item);
+  void increment(Items thisItem) {
+    Items newItem = Items(
+        id: thisItem.id,
+        name: thisItem.name,
+        image: thisItem.image,
+        cost: thisItem.cost,
+        describtion: thisItem.describtion,
+        favorite: thisItem.favorite,
+        shopcart: thisItem.shopcart,
+        count: thisItem.count + 1);
+    ApiService().updateProductStatus(newItem);
     setState(() {
       UpdatedItemsFavList.elementAt(
-              UpdatedItemsFavList.indexWhere((el) => el.id == this_item.id))
+              UpdatedItemsFavList.indexWhere((el) => el.id == thisItem.id))
           .count += 1;
     });
   }
 
-  void decrement(Items this_item) {
-    final count = this_item.count;
-    Items new_item;
+  void decrement(Items thisItem) {
+    final count = thisItem.count;
+    Items newItem;
     if (count == 1) {
-      new_item = Items(
-          id: this_item.id,
-          name: this_item.name,
-          image: this_item.image,
-          cost: this_item.cost,
-          describtion: this_item.describtion,
-          favorite: this_item.favorite,
+      newItem = Items(
+          id: thisItem.id,
+          name: thisItem.name,
+          image: thisItem.image,
+          cost: thisItem.cost,
+          describtion: thisItem.describtion,
+          favorite: thisItem.favorite,
           shopcart: false,
           count: 0);
     } else {
-      new_item = Items(
-          id: this_item.id,
-          name: this_item.name,
-          image: this_item.image,
-          cost: this_item.cost,
-          describtion: this_item.describtion,
-          favorite: this_item.favorite,
-          shopcart: this_item.shopcart,
-          count: this_item.count - 1);
+      newItem = Items(
+          id: thisItem.id,
+          name: thisItem.name,
+          image: thisItem.image,
+          cost: thisItem.cost,
+          describtion: thisItem.describtion,
+          favorite: thisItem.favorite,
+          shopcart: thisItem.shopcart,
+          count: thisItem.count - 1);
     }
-    ApiService().updateProductStatus(new_item);
+    ApiService().updateProductStatus(newItem);
     setState(() {
       if (count == 1) {
         UpdatedItemsFavList.elementAt(
-                UpdatedItemsFavList.indexWhere((el) => el.id == this_item.id))
+                UpdatedItemsFavList.indexWhere((el) => el.id == thisItem.id))
             .shopcart = false;
       } else {
         UpdatedItemsFavList.elementAt(
-                UpdatedItemsFavList.indexWhere((el) => el.id == this_item.id))
+                UpdatedItemsFavList.indexWhere((el) => el.id == thisItem.id))
             .count -= 1;
       }
     });
@@ -152,7 +152,7 @@ class _FavoritePageState extends State<FavoritePage> {
             future: ItemsFavList,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -234,7 +234,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                 child: SizedBox(
                                   height: 35.0,
                                   child: Text(
-                                    '${ItemsFavList.elementAt(index).name}',
+                                    ItemsFavList.elementAt(index).name,
                                     style: const TextStyle(fontSize: 12),
                                     softWrap: true,
                                     maxLines: 2,
@@ -285,7 +285,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                                   MainAxisAlignment.center,
                                               children: [
                                                 IconButton(
-                                                    icon: Icon(Icons.remove),
+                                                    icon: const Icon(Icons.remove),
                                                     onPressed: () => {
                                                           decrement(
                                                               UpdatedItemsFavList
@@ -323,7 +323,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                                   ),
                                                 ),
                                                 IconButton(
-                                                    icon: Icon(Icons.add),
+                                                    icon: const Icon(Icons.add),
                                                     onPressed: () => {
                                                           increment(
                                                               UpdatedItemsFavList

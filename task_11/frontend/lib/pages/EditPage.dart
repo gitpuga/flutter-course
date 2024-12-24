@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:task_8_9/api_service.dart';
-import 'package:task_8_9/model/person.dart';
+import 'package:frontend/api_service.dart';
+import 'package:frontend/auth/auth_service.dart';
+import 'package:frontend/model/person.dart';
 
 class EditPage extends StatefulWidget {
   const EditPage({super.key});
@@ -15,15 +16,18 @@ class _EditPageState extends State<EditPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController mailController = TextEditingController();
+  final userEmail = AuthService().getCurrentUserEmail();
   String img_link = '';
 
   @override
   void initState() {
     super.initState();
-    ApiService().getUserByID(1).then((value) => {
+    ApiService().getUserByID(userEmail).then((value) => {
           imageController.text = value.image,
           nameController.text = value.name,
-          phoneController.text = value.phone,
+          value.phone != 'null'
+              ? phoneController.text = value.phone
+              : phoneController.text = '',
           mailController.text = value.mail,
           img_link = value.image
         });
@@ -55,10 +59,10 @@ class _EditPageState extends State<EditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: true,
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: const Color.fromARGB(255, 255, 246, 218),
         appBar: AppBar(
           title: const Text('Профиль'),
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          backgroundColor: Colors.amber[200],
         ),
         body: SingleChildScrollView(
             physics:
@@ -74,7 +78,7 @@ class _EditPageState extends State<EditPage> {
                         width: MediaQuery.of(context).size.width * 0.5,
                         height: MediaQuery.of(context).size.width * 0.5,
                         decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 255, 255, 255),
+                            color: Colors.amber[100],
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.grey, width: 2),
                             image: DecorationImage(
@@ -95,10 +99,12 @@ class _EditPageState extends State<EditPage> {
                             TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 1.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 1.0)),
                         focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 2.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 2.0)),
                       ),
                       controller: imageController,
                       onChanged: (text) {
@@ -117,10 +123,12 @@ class _EditPageState extends State<EditPage> {
                             TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 1.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 1.0)),
                         focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 2.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 2.0)),
                       ),
                       controller: nameController,
                     ),
@@ -131,16 +139,18 @@ class _EditPageState extends State<EditPage> {
                       style:
                           const TextStyle(fontSize: 14.0, color: Colors.black),
                       decoration: const InputDecoration(
-                        fillColor: Color.fromARGB(255, 255, 255, 255),
+                        fillColor: Color.fromARGB(255, 255, 246, 218),
                         hintText: 'Телефон',
                         hintStyle:
                             TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 1.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 1.0)),
                         focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 2.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 2.0)),
                       ),
                       controller: phoneController,
                     ),
@@ -151,16 +161,18 @@ class _EditPageState extends State<EditPage> {
                       style:
                           const TextStyle(fontSize: 14.0, color: Colors.black),
                       decoration: const InputDecoration(
-                        fillColor: Color.fromARGB(255, 255, 255, 255),
+                        fillColor: Color.fromARGB(255, 255, 246, 218),
                         hintText: 'Почта',
                         hintStyle:
                             TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 1.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 1.0)),
                         focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 2.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 2.0)),
                       ),
                       controller: mailController,
                     ),
@@ -170,8 +182,7 @@ class _EditPageState extends State<EditPage> {
                   ),
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 255, 255, 255),
+                          backgroundColor: Colors.amber[200],
                           padding: const EdgeInsets.only(
                               bottom: 13.0, top: 13.0, right: 30.0, left: 30.0),
                           shape: RoundedRectangleBorder(

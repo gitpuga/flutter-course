@@ -1,53 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:task_8_9/api_service.dart';
-import 'package:task_8_9/model/person.dart';
+import 'package:frontend/api_service.dart';
+import 'package:frontend/auth/auth_service.dart';
 
-class EditPage extends StatefulWidget {
-  const EditPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<EditPage> createState() => _EditPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _EditPageState extends State<EditPage> {
-  late Future<Person> person;
-  final TextEditingController imageController = TextEditingController();
+class _RegisterPageState extends State<RegisterPage> {
+  final authService = AuthService();
   final TextEditingController nameController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
   final TextEditingController mailController = TextEditingController();
-  String img_link = '';
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    ApiService().getUserByID(1).then((value) => {
-          imageController.text = value.image,
-          nameController.text = value.name,
-          phoneController.text = value.phone,
-          mailController.text = value.mail,
-          img_link = value.image
-        });
-  }
+  void signUp() async {
+    final name = nameController.text;
+    final email = mailController.text;
+    final password = passwordController.text;
+    final confirmPassword = confirmPasswordController.text;
 
-  void enter_img(String text) {
-    setState(() {
-      img_link = text;
-    });
-  }
-
-  void UpdateUser() {
-    if (imageController.text.isNotEmpty &&
-        nameController.text.isNotEmpty &&
-        phoneController.text.isNotEmpty &&
-        mailController.text.isNotEmpty) {
-      print(nameController.text);
-      ApiService().updateUser(Person(
-          id: 1,
-          image: imageController.text,
-          name: nameController.text,
-          phone: phoneController.text,
-          mail: mailController.text));
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: const Text(
+          'Пароли не совпадают',
+          style: TextStyle(color: Colors.black, fontSize: 16.0),
+        ),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      ));
+      return;
+    }
+    try {
+      await authService.signUpWithEmailPassword(email, password);
+      await ApiService().addNewUser(name, email);
       Navigator.pop(context);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            "Error: $e",
+            style: const TextStyle(color: Colors.black, fontSize: 16.0),
+          ),
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        ));
+      }
     }
   }
 
@@ -57,55 +56,17 @@ class _EditPageState extends State<EditPage> {
         resizeToAvoidBottomInset: true,
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         appBar: AppBar(
-          title: const Text('Профиль'),
+          title: const Text('Регистрация'),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         ),
         body: SingleChildScrollView(
             physics:
                 const BouncingScrollPhysics(), // Optional for a smoother scroll experience
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(
+                  left: 16.0, right: 16.0, bottom: 16.0, top: 200.0),
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15.0, bottom: 15.0),
-                    child: Center(
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        height: MediaQuery.of(context).size.width * 0.5,
-                        decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 255, 255, 255),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.grey, width: 2),
-                            image: DecorationImage(
-                              image: NetworkImage(img_link),
-                              fit: BoxFit.cover,
-                            )),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: TextField(
-                      style:
-                          const TextStyle(fontSize: 14.0, color: Colors.black),
-                      decoration: const InputDecoration(
-                        hintText: 'Картинка',
-                        hintStyle:
-                            TextStyle(fontSize: 14.0, color: Colors.grey),
-                        enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 1.0)),
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 2.0)),
-                      ),
-                      controller: imageController,
-                      onChanged: (text) {
-                        enter_img(text);
-                      },
-                    ),
-                  ),
                   Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: TextField(
@@ -117,10 +78,12 @@ class _EditPageState extends State<EditPage> {
                             TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 1.0)),
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                width: 1.0)),
                         focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 2.0)),
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                width: 2.0)),
                       ),
                       controller: nameController,
                     ),
@@ -131,18 +94,19 @@ class _EditPageState extends State<EditPage> {
                       style:
                           const TextStyle(fontSize: 14.0, color: Colors.black),
                       decoration: const InputDecoration(
-                        fillColor: Color.fromARGB(255, 255, 255, 255),
-                        hintText: 'Телефон',
+                        hintText: 'Почта',
                         hintStyle:
                             TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 1.0)),
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                width: 1.0)),
                         focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 2.0)),
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                width: 2.0)),
                       ),
-                      controller: phoneController,
+                      controller: mailController,
                     ),
                   ),
                   Padding(
@@ -152,17 +116,41 @@ class _EditPageState extends State<EditPage> {
                           const TextStyle(fontSize: 14.0, color: Colors.black),
                       decoration: const InputDecoration(
                         fillColor: Color.fromARGB(255, 255, 255, 255),
-                        hintText: 'Почта',
+                        hintText: 'Пароль',
                         hintStyle:
                             TextStyle(fontSize: 14.0, color: Colors.grey),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 1.0)),
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                width: 1.0)),
                         focusedBorder: UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(0, 0, 0, 1), width: 2.0)),
+                                color: Color.fromRGBO(255, 160, 0, 1),
+                                width: 2.0)),
                       ),
-                      controller: mailController,
+                      controller: passwordController,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: TextField(
+                      style:
+                          const TextStyle(fontSize: 14.0, color: Colors.black),
+                      decoration: const InputDecoration(
+                        fillColor: Color.fromARGB(255, 255, 255, 255),
+                        hintText: 'Повторите пароль',
+                        hintStyle:
+                            TextStyle(fontSize: 14.0, color: Colors.grey),
+                        enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                width: 1.0)),
+                        focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                width: 2.0)),
+                      ),
+                      controller: confirmPasswordController,
                     ),
                   ),
                   const SizedBox(
@@ -170,17 +158,14 @@ class _EditPageState extends State<EditPage> {
                   ),
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color.fromARGB(255, 255, 255, 255),
+                          backgroundColor: const Color.fromARGB(255, 132, 226, 255),
                           padding: const EdgeInsets.only(
                               bottom: 13.0, top: 13.0, right: 30.0, left: 30.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
                           )),
-                      onPressed: () {
-                        UpdateUser();
-                      },
-                      child: const Text('Сохранить',
+                      onPressed: signUp,
+                      child: const Text('Зарегистрироваться',
                           style: TextStyle(fontSize: 16, color: Colors.black)))
                 ],
               ),

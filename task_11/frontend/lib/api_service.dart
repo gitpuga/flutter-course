@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:frontend/model/items.dart';
 import 'package:frontend/model/person.dart';
@@ -7,9 +9,9 @@ class ApiService {
 
   final ip = '192.168.1.23';
 
-  Future<List<Items>> getProducts() async {
+  Future<List<Items>> getProducts(String email) async {
     try {
-      final response = await _dio.get('http://$ip:8080/products');
+      final response = await _dio.get('http://$ip:8080/products/$email');
       if (response.statusCode == 200) {
         List<Items> products = (response.data as List)
             .map((product) => Items.fromJson(product))
@@ -24,8 +26,8 @@ class ApiService {
     }
   }
 
-  Future<Items> getProductsByID(int index) async {
-    final link = 'http://$ip:8080/products/${index.toString()}';
+  Future<Items> getProductsByID(int index, String email) async {
+    final link = 'http://$ip:8080/products/$email/${index.toString()}';
     try {
       final response = await _dio.get(link);
       if (response.statusCode == 200) {
@@ -100,7 +102,7 @@ class ApiService {
     }
   }
 
-  Future<List<Items>> getShopCartProducts(userId) async {
+  Future<List<Items>> getShopCartProducts(String userId) async {
     try {
       final response = await _dio.get('http://$ip:8080/cart/$userId');
       if (response.statusCode == 200) {
@@ -117,7 +119,7 @@ class ApiService {
     }
   }
 
-  Future<void> addProductShopCart(Items item, userId) async {
+  Future<void> addProductShopCart(Items item, String userId) async {
     final link = 'http://$ip:8080/cart/$userId';
     try {
       final response = await _dio.post(link, data: {
@@ -140,7 +142,7 @@ class ApiService {
     }
   }
 
-  Future<void> updateProductShopCart(Items item, userId) async {
+  Future<void> updateProductShopCart(Items item, String userId) async {
     final link = 'http://$ip:8080/cart/$userId';
     try {
       final response = await _dio.put(link, data: {
@@ -163,7 +165,7 @@ class ApiService {
     }
   }
 
-  Future<void> deleteProductShopCart(int userId, int productId) async {
+  Future<void> deleteProductShopCart(String userId, int productId) async {
     final link = 'http://$ip:8080/cart/$userId/$productId';
     try {
       final response = await _dio.delete(link);
@@ -177,7 +179,7 @@ class ApiService {
     }
   }
 
-  Future<List<Items>> getFavoriteProducts(userId) async {
+  Future<List<Items>> getFavoriteProducts(String userId) async {
     try {
       final response = await _dio.get('http://$ip:8080/favorites/$userId');
       if (response.statusCode == 200) {
@@ -194,7 +196,7 @@ class ApiService {
     }
   }
 
-  Future<void> addProductFavorite(Items item, userId) async {
+  Future<void> addProductFavorite(Items item, String userId) async {
     final link = 'http://$ip:8080/favorites/$userId';
     try {
       final response = await _dio.post(link, data: {
@@ -217,7 +219,7 @@ class ApiService {
     }
   }
 
-  Future<void> deleteProductFavorite(int userId, int productId) async {
+  Future<void> deleteProductFavorite(String userId, int productId) async {
     final link = 'http://$ip:8080/favorites/$userId/$productId';
     try {
       final response = await _dio.delete(link);
@@ -231,7 +233,7 @@ class ApiService {
     }
   }
 
-  Future<Person> getUserByID(int index) async {
+  Future<Person> getUserByID(String? index) async {
     final link = 'http://$ip:8080/users/$index';
     try {
       final response = await _dio.get(link);
@@ -255,6 +257,23 @@ class ApiService {
         'Image': item.image,
         'Phone': item.phone,
         'Mail': item.mail,
+      });
+      if (response.statusCode == 200) {
+        return;
+      } else {
+        throw Exception('Failed to load products');
+      }
+    } catch (e) {
+      throw Exception('Error fetching products: $e');
+    }
+  }
+
+  Future<void> addNewUser(String name, String mail) async {
+    final link = 'http://$ip:8080/users';
+    try {
+      final response = await _dio.post(link, data: {
+        'Name': name,
+        'Mail': mail,
       });
       if (response.statusCode == 200) {
         return;
